@@ -17,6 +17,7 @@ with open(budget_csv,"r", newline="") as budget_file:
     Diff = 0
     DiffMax = 0
     DiffMin = 0
+    change_list = []
 
     #skip header row
     csv_header = next(budget_file)
@@ -31,14 +32,14 @@ with open(budget_csv,"r", newline="") as budget_file:
         #define diff calculation
         Diff = iAmount - prev_mo
 
-#The total number of months included in the dataset
+        #The total number of months included in the dataset
         total_months = total_months + 1
         
         #The net total amount of "Profit/Losses" over the entire period
         total_prof_loss += iAmount
 
         #The average of the changes in "Profit/Losses" over the entire period
-        avg_change = total_prof_loss / total_months
+        change_list.append(Diff)
 
         #The greatest increase in profits (date and amount) over the entire period
         if DiffMax < Diff:
@@ -52,6 +53,13 @@ with open(budget_csv,"r", newline="") as budget_file:
 
         prev_mo = iAmount
 
+    #Find average change from change_list
+    #omit first row change
+    change_list_sliced = change_list[1:]
+    #calculate average
+    avg_change = sum(change_list_sliced)/len(change_list_sliced)
+
+    #output list in terminal
     output_list = [
     print(f'Financial Analysis'),
     print(f'------------------------------------'),
@@ -61,12 +69,12 @@ with open(budget_csv,"r", newline="") as budget_file:
     print(f'Greatest Increase in Profits: {DiffMaxDate} (${DiffMax})'),
     print(f'Greatest Decrease in Profits: {DiffMinDate} (${DiffMin})')]
 
-#Write to text file
+# #Write to text file
 with open("PyBank_Analysis.txt","w") as out_file:
     out_file.write(f"Financial Analysis \n")
     out_file.write(f"------------------------------------\n")
     out_file.write(f"Total Months: {total_months}\n")
     out_file.write(f"Total: ${total_prof_loss:.0f}\n")
-    out_file.write(f"Average Change: {avg_change:.2f}\n")
+    out_file.write(f"Average Change: ${avg_change:.2f}\n")
     out_file.write(f"Greatest Increase in Profits: {DiffMaxDate} (${DiffMax})\n")
     out_file.write(f"Greatest Decrease in Profits: {DiffMinDate} (${DiffMin})\n")
